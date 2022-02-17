@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:helloworld/screens/constants.dart';
+import 'package:helloworld/screens/result_screen.dart';
+import './../components/components.dart';
 
 enum Gender { male, female }
 
@@ -17,11 +19,44 @@ class _HomeScreenState extends State<HomeScreen> {
   int weight = 1;
   int age = 1;
 
+  Map<dynamic, dynamic> result(
+      {required double height, required double weight}) {
+    double heightInMeter = height.toDouble() / 100;
+
+    final bmi = weight.toDouble() / (heightInMeter * heightInMeter);
+
+    if (bmi <= 18.5) {
+      return {
+        "result": bmi,
+        "rangeValue": "Below 18,5",
+        "interpretation": "underweight"
+      };
+    } else if (bmi >= 18.5 && bmi <= 24.9) {
+      return {
+        "result": bmi,
+        "rangeValue": "18,5 - 24,9",
+        "interpretation": "normal weight"
+      };
+    } else if (bmi >= 25 && bmi <= 29.9) {
+      return {
+        "result": bmi,
+        "rangeValue": "25 - 29,9",
+        "interpretation": "overweight"
+      };
+    } else {
+      return {
+        "result": bmi,
+        "rangeValue": "30 - Above",
+        "interpretation": "obesity"
+      };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("HAMID CALCUlATOR"),
+        title: const Text("BY DOCTOR HAMID"),
         backgroundColor: kAppBarColor,
         elevation: 8,
       ),
@@ -37,66 +72,43 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(25),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: kGenderBoxColor,
-                          ),
-                          child: Column(children: const [
-                            Icon(
-                              Icons.male,
-                              color: Colors.white,
-                              size: 100,
-                            ),
-                            SizedBox(height: 20),
-                            Text(
-                              "MALE",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )
-                          ]),
+                        child: GenderButtonComponent(
+                          title: "MALE",
+                          bgColor: gender == Gender.male
+                              ? kGenderBoxColor
+                              : kBodyColor,
+                          buttonIcon: Icons.male,
+                          onTap: (() {
+                            setState(() {
+                              gender = Gender.male;
+                            });
+                          }),
                         ),
                       ),
                       const SizedBox(
                         width: 20,
                       ),
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(25),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            color: kBoxColor,
-                          ),
-                          child: Column(children: const [
-                            Icon(
-                              Icons.female,
-                              color: Colors.white,
-                              size: 100,
-                            ),
-                            SizedBox(height: 20),
-                            Text(
-                              "FEMALE",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )
-                          ]),
-                        ),
-                      )
+                          child: GenderButtonComponent(
+                        title: "FEMALE",
+                        bgColor: gender == Gender.female
+                            ? kGenderBoxColor
+                            : kBodyColor,
+                        buttonIcon: Icons.female,
+                        onTap: (() {
+                          setState(() {
+                            gender = Gender.female;
+                          });
+                        }),
+                      ))
                     ],
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 20,
                   ),
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.all(25),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
                         color: kBoxColor,
@@ -111,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const SizedBox(
-                            height: 6,
+                            height: 5,
                           ),
                           Row(
                             textBaseline: TextBaseline.alphabetic,
@@ -130,10 +142,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 'cm',
                                 style: TextStyle(
-                                    color: Colors.grey[400],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 26,
-                                    textBaseline: TextBaseline.alphabetic),
+                                  color: Colors.grey[400],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 26,
+                                  textBaseline: TextBaseline.alphabetic,
+                                ),
                               ),
                             ],
                           ),
@@ -149,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               setState(
                                 () {
                                   _sliderValue = value.toInt();
+                                  height = _sliderValue;
                                 },
                               );
                             },
@@ -157,15 +171,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 15),
                   Expanded(
                     child: Row(
                       children: [
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
                               color: kBoxColor,
@@ -183,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: 6,
                                 ),
                                 Text(
-                                  '74',
+                                  '$weight',
                                   style: TextStyle(
                                     color: Colors.grey[50],
                                     fontWeight: FontWeight.w900,
@@ -194,35 +206,49 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: kRoundedButtonColor,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: const Icon(
-                                        Icons.remove,
-                                        size: 35,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: (() {
+                                        setState(() {
+                                          if (weight > 10) weight--;
+                                        });
+                                      }),
+                                      child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: kRoundedButtonColor,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: const Icon(
+                                          Icons.remove,
+                                          size: 35,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
-                                      width: 16,
+                                      width: 10,
                                     ),
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: kRoundedButtonColor,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: const Icon(
-                                        Icons.add,
-                                        size: 35,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: (() {
+                                        setState(() {
+                                          if (weight < 600) weight++;
+                                        });
+                                      }),
+                                      child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: kRoundedButtonColor,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          size: 35,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     )
                                   ],
@@ -236,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
                               color: kBoxColor,
@@ -254,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: 6,
                                 ),
                                 Text(
-                                  '19',
+                                  '$age',
                                   style: TextStyle(
                                     color: Colors.grey[50],
                                     fontWeight: FontWeight.w900,
@@ -265,35 +291,49 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: kRoundedButtonColor,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: const Icon(
-                                        Icons.remove,
-                                        size: 35,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: (() {
+                                        setState(() {
+                                          if (age > 1) age--;
+                                        });
+                                      }),
+                                      child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: kRoundedButtonColor,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: const Icon(
+                                          Icons.remove,
+                                          size: 35,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(
                                       width: 16,
                                     ),
-                                    Container(
-                                      width: 50,
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: kRoundedButtonColor,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: const Icon(
-                                        Icons.add,
-                                        size: 35,
-                                        color: Colors.white,
+                                    GestureDetector(
+                                      onTap: (() {
+                                        setState(() {
+                                          if (age < 120) age++;
+                                        });
+                                      }),
+                                      child: Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: kRoundedButtonColor,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                        ),
+                                        child: const Icon(
+                                          Icons.add,
+                                          size: 35,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     )
                                   ],
@@ -312,16 +352,49 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(
             height: 20,
           ),
-          Container(
-            color: kMainButtonColor,
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-            child: const Center(
-              child: Text(
-                'CALCULATE YOUR BMI',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
+          InkWell(
+            highlightColor: Colors.white,
+            splashColor: Colors.amberAccent,
+            radius: 10,
+            onTap: (() {
+              setState(() {
+                if (height >= 120 && weight >= 30.0) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) {
+                        return ResultScreen(
+                          bmiResult: result(
+                            height: height.toDouble(),
+                            weight: weight.toDouble(),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                } else {
+                  showAboutDialog(
+                    context: context,
+                    applicationIcon: const Icon(Icons.cancel),
+                    applicationName: "Dr. HAMID",
+                    children: [
+                      const Text('Please provide good information.'),
+                    ],
+                  );
+                }
+              });
+            }),
+            child: Container(
+              color: kMainButtonColor,
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+              child: const Center(
+                child: Text(
+                  'CALCULATE YOUR BMI',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                  ),
                 ),
               ),
             ),
